@@ -49,30 +49,54 @@ Follow these steps to get AdSweep running on your local machine.
 
 ### 1. Clone & Setup the Environment
 
-First, clone the repository and set up a Python virtual environment.
+First, clone the repository. This project uses Poetry for dependency and environment management.
 
 ```bash
 # Clone the project (or create the directory structure)
 git clone <your-repo-url> adsweep
 cd adsweep
+```
 
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+Install Poetry if you don't already have it (official installer):
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+# or follow https://python-poetry.org/docs/#installation for alternate methods
+```
+
+Create the project environment and add dependencies with Poetry. If this repo doesn't already have a `pyproject.toml`, initialize it and add the runtime requirements shown below.
+
+```bash
+# Initialize pyproject.toml (follow prompts or use --no-interaction)
+poetry init --no-interaction
+
+# Add the runtime dependencies
+poetry add playwright python-dotenv jinja2
+
+# Create a virtual environment and install dependencies from pyproject.lock/pyproject.toml
+poetry install
+
+# Optional: spawn a shell with the venv active
+poetry shell
 ```
 
 ### 2. Install Dependencies
 
-Install the required Python packages using `pip`.
+Poetry manages dependencies and the virtual environment for you. After running `poetry add` (above) or if you cloned a repo that already contains `pyproject.toml`, simply run:
 
 ```bash
-# Install packages from requirements.txt
-pip install -r requirements.txt
-
-# Download the necessary browser binaries for Playwright
-playwright install
+poetry install
 ```
-*(File: `requirements.txt`)*
+
+Then install the Playwright browser binaries using Poetry's environment:
+
+```bash
+poetry run playwright install
+# or if inside `poetry shell`, run: playwright install
+```
+
+Dependencies used by this project (declared in `pyproject.toml`) include:
+
 ```
 playwright
 python-dotenv
@@ -170,12 +194,14 @@ def get_swydo_data(page: Page) -> dict:
 Execute the main script from your terminal. The tool will run in headless mode (no browser window will appear).
 
 ```bash
-python main.py
+poetry run python main.py
 ```
 
 -   The script will print its progress to the console.
 -   Upon completion, a message will indicate where the report has been saved.
 -   If any scraper fails, a screenshot will be saved in the `output/screenshots/` directory to help with debugging.
+
+Tip: during development you can use `poetry shell` to get an interactive shell with the project's virtual environment activated, then run `python main.py` directly.
 
 ### 6. View the Report
 
