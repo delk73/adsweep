@@ -1,253 +1,86 @@
 # AdSweep: Automated Swydo Reporting Aggregator
 
-**AdSweep** is a Python-based automation tool designed to log into Swydo, navigate through various ad accounts, and aggregate key reporting data into a single, clean, and easy-to-read HTML document. It's built for agencies and individuals who manage numerous scattered accounts and need a consolidated daily overview without manual effort.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This tool uses the powerful **Playwright** library for robust, headless browser automation, ensuring it can handle modern, JavaScript-heavy web applications like Swydo reliably.
+AdSweep is a Python-based web scraper designed to automate the process of logging into Swydo, navigating to specific reports, and generating a consolidated HTML output. It uses Playwright for browser automation.
 
-## Key Features
+## Features
 
--   **Automated Login:** Securely logs into your Swydo account.
--   **Data Aggregation:** Scrapes data from specified accounts and reports.
--   **Modular Scrapers:** Easily add new scraping tasks for different sections of Swydo.
--   **Secure Credential Management:** Uses a `.env` file to keep your username and password out of the source code.
--   **Robust Error Handling:** Captures errors during scraping and provides screenshots for easy debugging.
--   **Clean HTML Reports:** Generates a single, scrollable HTML file with a timestamped summary of all accounts.
+*   Automated login to Swydo.
+*   Scraping of specified Swydo reports.
+*   Generation of a single, consolidated HTML report from the scraped data.
+*   Screenshots of the reports for verification.
+*   Headless browser operation for server-based execution.
 
----
+## Prerequisites
 
-## Project Structure
+Before you begin, ensure you have the following installed:
+*   [Git](https://git-scm.com/)
+*   [Python](https://www.python.org/downloads/) (version 3.8 or higher)
+*   [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 
-AdSweep is organized for clarity and maintainability:
+## Installation & Setup
 
-```
-adsweep/
-├── main.py                 # The main script to run the sweep.
-├── requirements.txt        # Python dependencies.
-├── .env.example            # Example credentials file.
-├── .gitignore              # Ignores sensitive and temporary files.
-├── sources/                # A module for each distinct scraping task.
-│   ├── __init__.py
-│   └── swydo_scraper.py      # The core logic for scraping Swydo.
-├── report_generator.py     # Builds the final HTML report.
-└── templates/              # Contains the HTML template for the report.
-    └── report_template.html
-└── output/                 # Where the final report and debug screenshots are saved.
-    ├── ad_sweep_report.html
-    └── screenshots/
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/adsweep.git
+    cd adsweep
+    ```
 
----
+2.  **Bootstrap the project:**
+    This command will install all the necessary Python dependencies using Poetry and download the required Playwright browser binaries.
+    ```bash
+    make bootstrap
+    ```
+    Alternatively, you can run the steps manually:
+    ```bash
+    poetry install
+    poetry run playwright install
+    ```
 
-## Getting Started
+## Configuration
 
-Follow these steps to get AdSweep running on your local machine.
+AdSweep requires credentials to log into Swydo. These are managed via a `.env` file.
 
-### Prerequisites
-
--   Python 3.8 or newer
--   Access to a command line/terminal
-
-### 1. Clone & Setup the Environment
-
-First, clone the repository. This project uses Poetry for dependency and environment management.
-
-```bash
-# Clone the project (or create the directory structure)
-git clone <your-repo-url> adsweep
-cd adsweep
-```
-
-Install Poetry if you don't already have it (official installer):
-
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-# or follow https://python-poetry.org/docs/#installation for alternate methods
-```
-
-Create the project environment and add dependencies with Poetry. If this repo doesn't already have a `pyproject.toml`, initialize it and add the runtime requirements shown below.
-
-```bash
-# Initialize pyproject.toml (follow prompts or use --no-interaction)
-poetry init --no-interaction
-
-# Add the runtime dependencies
-poetry add playwright python-dotenv jinja2
-
-# Create a virtual environment and install dependencies from pyproject.lock/pyproject.toml
-poetry install
-
-# Optional: spawn a shell with the venv active
-poetry shell
-```
-
-Using Make (recommended)
----------------------------------
-This repository includes a `Makefile` with common tasks. The recommended standard entrypoint is `make bootstrap`, which will install dependencies and the Playwright browsers.
-
-```bash
-# Install dependencies and Playwright browsers
-make bootstrap
-
-# Run the app
-make run
-
-# Start an interactive shell in the project's venv
-make shell
-```
-
-### 2. Install Dependencies
-
-Poetry manages dependencies and the virtual environment for you. After running `poetry add` (above) or if you cloned a repo that already contains `pyproject.toml`, simply run:
-
-```bash
-poetry install
-```
-
-Then install the Playwright browser binaries using Poetry's environment:
-
-```bash
-poetry run playwright install
-# or if inside `poetry shell`, run: playwright install
-```
-
-Dependencies used by this project (declared in `pyproject.toml`) include:
-
-```
-playwright
-python-dotenv
-jinja2
-```
-
-### 3. Configure Credentials
-
-Your Swydo credentials must be stored securely.
-
-1.  Make a copy of the example environment file:
+1.  **Create a `.env` file** by copying the example file:
     ```bash
     cp .env.example .env
     ```
-2.  Open the newly created `.env` file and enter your Swydo login details.
 
-*(File: `.env`)*
-```ini
-# --- AdSweep Configuration ---
-# Enter your Swydo login credentials below
+2.  **Edit the `.env` file** with your Swydo credentials and the report URLs you want to scrape:
+    ```
+    # .env
+    SWYDO_EMAIL="your_email@example.com"
+    SWYDO_PASSWORD="your_password"
+    # Add the full URLs of the Swydo reports to scrape
+    REPORT_URLS="https://app.swydo.com/reports/12345,https://app.swydo.com/reports/67890"
+    ```
 
-SWYDO_USERNAME="your-swydo-email@example.com"
-SWYDO_PASSWORD="your-super-secret-password"
-```
-> **Security Note:** The `.gitignore` file is pre-configured to ignore the `.env` file, ensuring you never accidentally commit your credentials to a repository.
+## Usage
 
-### 4. Customize the Scraper
-
-The core logic resides in `sources/swydo_scraper.py`. You will need to customize this file to navigate to the specific reports you need.
-
-**Tip:** Use Playwright's CodeGen tool to easily find the correct selectors. Run this command, and then manually perform the actions in the browser window that opens. Playwright will print the corresponding Python code for you.
-
+To run the scraper, execute the following command:
 ```bash
-playwright codegen https://app.swydo.com/
+make run
 ```
+This will start the scraping process. The output, including the consolidated `report.html` and screenshots, will be saved in the `output/` directory.
 
-*(File: `sources/swydo_scraper.py`)*
-```python
-# sources/swydo_scraper.py
+## Development
 
-import os
-import logging
-from playwright.sync_api import Page, expect
+The project uses a `Makefile` to streamline common development tasks.
 
-# ... (logging configuration) ...
+*   `make help`: Show all available Make targets.
+*   `make install`: Install Python dependencies.
+*   `make playwright-install`: Install Playwright browser binaries.
+*   `make bootstrap`: A one-stop command to set up the project.
+*   `make run`: Run the AdSweep scraper.
+*   `make shell`: Open an interactive shell within the project's virtual environment.
+*   `make lint`: (Placeholder) Run linters and tests.
+*   `make clean`: Remove temporary files and build artifacts.
 
-def get_swydo_data(page: Page) -> dict:
-    """
-    Logs into Swydo, scrapes ad account data, and returns it.
-    """
-    logging.info("Starting Swydo scraper...")
-    username = os.getenv("SWYDO_USERNAME")
-    password = os.getenv("SWYDO_PASSWORD")
-    
-    # ... (credential check) ...
+## Contributing
 
-    try:
-        # 1. LOGIN
-        logging.info("Navigating to Swydo login page.")
-        page.goto("https://app.swydo.com/")
-        page.get_by_label("Email").fill(username)
-        page.get_by_label("Password").fill(password)
-        page.get_by_role("button", name="Login").click()
-        
-        # Wait for dashboard to ensure login was successful
-        expect(page.get_by_role("heading", name="Clients")).to_be_visible(timeout=20000)
-        logging.info("Successfully logged into Swydo.")
-        
-        # 2. NAVIGATE & SCRAPE (!!! CUSTOMIZE THIS SECTION !!!)
-        logging.info("Navigating to client reports...")
-        # EXAMPLE: This is where you add your specific navigation and data extraction logic.
-        # page.goto("https://app.swydo.com/reports/your-specific-report-url")
-        #
-        # account_rows = page.locator(".report-table tr").all()
-        # for row in account_rows:
-        #     # ... extract data from cells ...
+Contributions are welcome! Please feel free to submit a pull request.
 
-        # Placeholder data - replace with your actual scraped data
-        scraped_data = [
-            {"Client": "Client Alpha", "Spend": "$1,200", "Conversions": "50"},
-            {"Client": "Client Bravo", "Spend": "$3,500", "Conversions": "120"},
-        ]
+## License
 
-        logging.info(f"Successfully scraped data for {len(scraped_data)} clients.")
-        
-        return {"title": "Swydo Ad Accounts", "status": "success", "data": scraped_data}
-
-    except Exception as e:
-        # ... (error handling and screenshot logic) ...
-        # ...
-```
-
-### 5. Run AdSweep
-
-Execute the main script from your terminal. The tool will run in headless mode (no browser window will appear).
-
-```bash
-poetry run python main.py
-```
-
--   The script will print its progress to the console.
--   Upon completion, a message will indicate where the report has been saved.
--   If any scraper fails, a screenshot will be saved in the `output/screenshots/` directory to help with debugging.
-
-Tip: during development you can use `poetry shell` to get an interactive shell with the project's virtual environment activated, then run `python main.py` directly.
-
-### 6. View the Report
-
-Open the generated HTML file in your web browser to view the consolidated report.
-
-`output/ad_sweep_report.html`
-
----
-
-## How to Add a New Scraper
-
-The project is designed to be easily extendable, for instance, if you wanted to scrape another platform in addition to Swydo.
-
-1.  **Create a New Scraper File:** Add a new file like `new_platform_scraper.py` in the `sources/` directory.
-2.  **Define a Scraper Function:** Inside the new file, create a function (e.g., `get_new_platform_data`) that follows the same pattern: it takes a `page` object and returns a dictionary.
-3.  **Add Credentials:** Add the necessary credentials for the new platform to your `.env` file.
-4.  **Register in `main.py`:** Import your new function in `main.py` and add it to the `scraper_jobs` list.
-
-```python
-# main.py
-
-# ... imports ...
-from sources.swydo_scraper import get_swydo_data
-from sources.new_platform_scraper import get_new_platform_data # 1. Import
-
-# ...
-def main():
-    # ...
-    scraper_jobs = [
-        get_swydo_data,
-        get_new_platform_data, # 2. Add to list
-    ]
-    # ...
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
