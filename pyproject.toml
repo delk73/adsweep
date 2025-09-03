@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "adsweep"
+version = "0.1.0"
+description = "Automated Swydo Reporting Aggregator"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+license = "MIT"
+keywords = ["playwright", "swydo", "scraper", "reporting"]
+packages = [ { include = "adsweep" } ]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+playwright = "^1.40.0"
+python-dotenv = "^1.0.0"
+jinja2 = "^3.1.2"
+
+[tool.poetry.group.dev.dependencies]
+# Dev dependencies intentionally left empty to keep the project minimal
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -80,6 +80,21 @@ poetry install
 poetry shell
 ```
 
+Using Make (recommended)
+---------------------------------
+This repository includes a `Makefile` with common tasks. The recommended standard entrypoint is `make bootstrap`, which will install dependencies and the Playwright browsers.
+
+```bash
+# Install dependencies and Playwright browsers
+make bootstrap
+
+# Run the app
+make run
+
+# Start an interactive shell in the project's venv
+make shell
+```
+
 ### 2. Install Dependencies
 
 Poetry manages dependencies and the virtual environment for you. After running `poetry add` (above) or if you cloned a repo that already contains `pyproject.toml`, simply run:
